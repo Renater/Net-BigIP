@@ -8,8 +8,7 @@ use Mojo::JSON qw(decode_json);
 
 our $VERSION = '0.2';
 
-sub new {
-    my ($class, %params) = @_;
+sub new($class, %params) {
 
     croak "missing url parameter" unless $params{url};
 
@@ -31,8 +30,7 @@ sub new {
     return $self;
 }
 
-sub create_session {
-    my ($self, %params) = @_;
+sub create_session($self, %params) {
 
     croak "missing username parameter" unless $params{username};
     croak "missing password parameter" unless $params{password};
@@ -52,14 +50,12 @@ sub create_session {
     });
 }
 
-sub get_token {
-    my ($self) = @_;
+sub get_token($self) {
 
     return $self->{token};
 }
 
-sub get_certificates {
-    my ($self, %params) = @_;
+sub get_certificates($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -79,8 +75,7 @@ sub get_certificates {
     return $result;
 }
 
-sub get_virtual_addresses {
-    my ($self, %params) = @_;
+sub get_virtual_addresses($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -100,8 +95,7 @@ sub get_virtual_addresses {
     return $result;
 }
 
-sub get_virtual_servers {
-    my ($self, %params) = @_;
+sub get_virtual_servers($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -124,8 +118,7 @@ sub get_virtual_servers {
     return $result;
 }
 
-sub get_virtual_server_policies {
-    my ($self, %params) = @_;
+sub get_virtual_server_policies($self, %params) {
 
     croak "missing virtual_server parameter" unless $params{virtual_server};
 
@@ -150,8 +143,7 @@ sub get_virtual_server_policies {
     return $result;
 }
 
-sub get_policy_rules {
-    my ($self, %params) = @_;
+sub get_policy_rules($self, %params) {
 
     croak "missing policy parameter" unless $params{policy};
 
@@ -176,8 +168,7 @@ sub get_policy_rules {
     return $result;
 }
 
-sub get_pools {
-    my ($self, %params) = @_;
+sub get_pools($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -197,8 +188,7 @@ sub get_pools {
     return $result;
 }
 
-sub get_pool_members {
-    my ($self, %params) = @_;
+sub get_pool_members($self, %params) {
 
     croak "missing pool parameter" unless $params{pool};
 
@@ -220,8 +210,7 @@ sub get_pool_members {
     return $result;
 }
 
-sub get_pool_member_stats {
-    my ($self, %params) = @_;
+sub get_pool_member_stats($self, %params) {
 
     croak "missing pool parameter" unless $params{pool};
 
@@ -243,8 +232,7 @@ sub get_pool_member_stats {
     return $result;
 }
 
-sub get_pool_stats {
-    my ($self, %params) = @_;
+sub get_pool_stats($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -264,8 +252,7 @@ sub get_pool_stats {
     return $result;
 }
 
-sub get_nodes {
-    my ($self, %params) = @_;
+sub get_nodes($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -285,8 +272,7 @@ sub get_nodes {
     return $result;
 }
 
-sub get_node_stats {
-    my ($self, %params) = @_;
+sub get_node_stats($self, %params) {
 
     my @parameters;
     if ($params{partition}) {
@@ -306,8 +292,7 @@ sub get_node_stats {
     return $result;
 }
 
-sub _post {
-    my ($self, $path, %params) = @_;
+sub _post($self, $path, %params) {
 
     my $tx = $self->{agent}->post($self->{url} . $path => json => \%params);
 
@@ -326,8 +311,7 @@ sub _post {
     }
 }
 
-sub _get {
-    my ($self, $path, %params) = @_;
+sub _get($self, $path, %params) {
 
     my $tx = $self->{agent}->get( $self->{url} . $path => form => \%params);
 
