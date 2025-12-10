@@ -1,7 +1,6 @@
 package Net::BigIP;
 
-use warnings;
-use strict;
+use Mojo::Base -strict, -signatures;
 
 use Carp;
 use Mojo::UserAgent;
