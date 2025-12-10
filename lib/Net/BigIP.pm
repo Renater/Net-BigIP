@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 use Carp;
-use LWP::UserAgent;
+use Mojo::UserAgent;
 use JSON;
 
 our $VERSION = '0.2';
@@ -15,22 +15,19 @@ sub new {
     croak "missing url parameter" unless $params{url};
 
     my $url   = $params{url};
-    my $agent = LWP::UserAgent->new();
+    my $agent = Mojo::UserAgent->new();
 
     $agent->timeout($params{timeout})
         if $params{timeout};
-    $agent->ssl_opts(%{$params{ssl_opts}})
+    $agent->tls_options($params{ssl_opts})
         if $params{ssl_opts} && ref $params{ssl_opts} eq 'HASH';
 
     my $self = {
         url   => $url,
-        agent => $agent
+        agent => $agent,
+        token => $params{token},
     };
     bless $self, $class;
-
-    if ($params{token}) {
-        $self->{agent}->default_header('X-F5-Auth-Token' => $params{token});
-    }
 
     return $self;
 }
@@ -48,13 +45,18 @@ sub create_session {
         loginProviderName => 'tmos'
     );
 
-    $self->{agent}->default_header('X-F5-Auth-Token' => "$result->{token}->{token}");
+    $self->{token} = $result->{token}->{token};
+
+    $self->{agent}->on(start => sub {
+        my ($ua, $tx) = @_;
+        $tx->req->headers->header('X-F5-Auth-Token' => $self->{token});
+    });
 }
 
 sub get_token {
     my ($self) = @_;
 
-    return $self->{agent}->default_header('X-F5-Auth-Token');
+    return $self->{token};
 }
 
 sub get_certificates {
@@ -308,23 +310,19 @@ sub get_node_stats {
 sub _post {
     my ($self, $path, %params) = @_;
 
-    my $content = to_json(\%params);
+    my $tx = $self->{agent}->post($self->{url} . $path => json => \%params);
 
-    my $response = $self->{agent}->post(
-        $self->{url} . $path,
-        'Content-Type' => 'application/json',
-        'Content'      => $content
-    );
+    my $result = $tx->result();
 
-    my $result = eval { from_json($response->content()) };
+    my $content = eval { from_json($result->body()) };
 
-    if ($response->is_success()) {
-        return $result;
+    if ($result->is_success()) {
+        return $content;
     } else {
-        if ($result) {
-            croak "server error: " . $result->{message};
+        if ($content) {
+            croak "server error: " . $content->{message};
         } else {
-            croak "communication error: " . $response->message()
+            croak "communication error: " . $result->message()
         }
     }
 }
@@ -332,20 +330,19 @@ sub _post {
 sub _get {
     my ($self, $path, %params) = @_;
 
-    my $url = URI->new($self->{url} . $path);
-    $url->query_form(%params);
+    my $tx = $self->{agent}->get( $self->{url} . $path => form => \%params);
 
-    my $response = $self->{agent}->get($url);
+    my $result = $tx->result();
 
-    my $result = eval { from_json($response->content()) };
+    my $content = eval { from_json($result->body()) };
 
-    if ($response->is_success()) {
-        return $result;
+    if ($result->is_success()) {
+        return $content;
     } else {
-        if ($result) {
-            croak "server error: " . $result->{message};
+        if ($content) {
+            croak "server error: " . $content->{message};
         } else {
-            croak "communication error: " . $response->message()
+            croak "communication error: " . $result->message()
         }
     }
 }

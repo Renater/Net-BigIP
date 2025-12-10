@@ -42,7 +42,7 @@ lives_ok {
 BAIL_OUT('unable to connect, skipping remaining tests') if $EVAL_ERROR;
 
 ok(
-    defined $bigip->{agent}->default_header('X-F5-Auth-Token'),
+    defined $bigip->get_token(),
     'bigip handle has authentication token'
 );
 
