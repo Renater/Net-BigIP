@@ -8,37 +8,37 @@ use Mojo::JSON qw(decode_json);
 
 our $VERSION = '0.3';
 
-sub new($class, %params) {
+sub new($class, %args) {
 
-    croak "missing url parameter" unless $params{url};
+    croak "missing url parameter" unless $args{url};
 
-    my $url   = $params{url};
+    my $url   = $args{url};
     my $agent = Mojo::UserAgent->new();
 
-    $agent->timeout($params{timeout})
-        if $params{timeout};
-    $agent->tls_options($params{ssl_opts})
-        if $params{ssl_opts} && ref $params{ssl_opts} eq 'HASH';
+    $agent->timeout($args{timeout})
+        if $args{timeout};
+    $agent->tls_options($args{ssl_opts})
+        if $args{ssl_opts} && ref $args{ssl_opts} eq 'HASH';
 
     my $self = {
         url   => $url,
         agent => $agent,
-        token => $params{token},
+        token => $args{token},
     };
     bless $self, $class;
 
     return $self;
 }
 
-sub create_session($self, %params) {
+sub create_session($self, %args) {
 
-    croak "missing username parameter" unless $params{username};
-    croak "missing password parameter" unless $params{password};
+    croak "missing username parameter" unless $args{username};
+    croak "missing password parameter" unless $args{password};
 
     my $result = $self->_post(
         "/mgmt/shared/authn/login",
-        username          => $params{username},
-        password          => $params{password},
+        username          => $args{username},
+        password          => $args{password},
         loginProviderName => 'tmos'
     );
 
@@ -55,14 +55,14 @@ sub get_token($self) {
     return $self->{token};
 }
 
-sub get_certificates($self, %params) {
+sub get_certificates($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/sys/file/ssl-cert";
@@ -75,14 +75,14 @@ sub get_certificates($self, %params) {
     return $result;
 }
 
-sub get_virtual_addresses($self, %params) {
+sub get_virtual_addresses($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/ltm/virtual-address";
@@ -95,17 +95,17 @@ sub get_virtual_addresses($self, %params) {
     return $result;
 }
 
-sub get_virtual_servers($self, %params) {
+sub get_virtual_servers($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
-    if ($params{expandSubcollections}) {
-        push @parameters, 'expandSubcollections=' . $params{expandSubcollections};
+    if ($args{expandSubcollections}) {
+        push @parameters, 'expandSubcollections=' . $args{expandSubcollections};
     }
 
     my $url = "/mgmt/tm/ltm/virtual";
@@ -118,22 +118,22 @@ sub get_virtual_servers($self, %params) {
     return $result;
 }
 
-sub get_virtual_server_policies($self, %params) {
+sub get_virtual_server_policies($self, %args) {
 
-    croak "missing virtual_server parameter" unless $params{virtual_server};
+    croak "missing virtual_server parameter" unless $args{virtual_server};
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
-    if ($params{expandSubcollections}) {
-        push @parameters, 'expandSubcollections=' . $params{expandSubcollections};
+    if ($args{expandSubcollections}) {
+        push @parameters, 'expandSubcollections=' . $args{expandSubcollections};
     }
 
-    my $url = "/mgmt/tm/ltm/virtual/$params{virtual_server}/policies";
+    my $url = "/mgmt/tm/ltm/virtual/$args{virtual_server}/policies";
     if (@parameters) {
         $url .= '/?' . join('&', @parameters);
     }
@@ -143,22 +143,22 @@ sub get_virtual_server_policies($self, %params) {
     return $result;
 }
 
-sub get_policy_rules($self, %params) {
+sub get_policy_rules($self, %args) {
 
-    croak "missing policy parameter" unless $params{policy};
+    croak "missing policy parameter" unless $args{policy};
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
-    if ($params{expandSubcollections}) {
-        push @parameters, 'expandSubcollections=' . $params{expandSubcollections};
+    if ($args{expandSubcollections}) {
+        push @parameters, 'expandSubcollections=' . $args{expandSubcollections};
     }
 
-    my $url = "/mgmt/tm/ltm/policy/$params{policy}/rules";
+    my $url = "/mgmt/tm/ltm/policy/$args{policy}/rules";
     if (@parameters) {
         $url .= '/?' . join('&', @parameters);
     }
@@ -168,14 +168,14 @@ sub get_policy_rules($self, %params) {
     return $result;
 }
 
-sub get_pools($self, %params) {
+sub get_pools($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/ltm/pool";
@@ -188,19 +188,19 @@ sub get_pools($self, %params) {
     return $result;
 }
 
-sub get_pool_members($self, %params) {
+sub get_pool_members($self, %args) {
 
-    croak "missing pool parameter" unless $params{pool};
+    croak "missing pool parameter" unless $args{pool};
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
-    my $url = "/mgmt/tm/ltm/pool/$params{pool}/members";
+    my $url = "/mgmt/tm/ltm/pool/$args{pool}/members";
     if (@parameters) {
         $url .= '/?' . join('&', @parameters);
     }
@@ -210,19 +210,19 @@ sub get_pool_members($self, %params) {
     return $result;
 }
 
-sub get_pool_member_stats($self, %params) {
+sub get_pool_member_stats($self, %args) {
 
-    croak "missing pool parameter" unless $params{pool};
+    croak "missing pool parameter" unless $args{pool};
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
-    my $url = "/mgmt/tm/ltm/pool/$params{pool}/members/stats";
+    my $url = "/mgmt/tm/ltm/pool/$args{pool}/members/stats";
     if (@parameters) {
         $url .= '/?' . join('&', @parameters);
     }
@@ -232,14 +232,14 @@ sub get_pool_member_stats($self, %params) {
     return $result;
 }
 
-sub get_pool_stats($self, %params) {
+sub get_pool_stats($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/ltm/pool/stats";
@@ -252,14 +252,14 @@ sub get_pool_stats($self, %params) {
     return $result;
 }
 
-sub get_nodes($self, %params) {
+sub get_nodes($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/ltm/node";
@@ -272,14 +272,14 @@ sub get_nodes($self, %params) {
     return $result;
 }
 
-sub get_node_stats($self, %params) {
+sub get_node_stats($self, %args) {
 
     my @parameters;
-    if ($params{partition}) {
-        push @parameters, '$filter=partition%20eq%20' . $params{partition};
+    if ($args{partition}) {
+        push @parameters, '$filter=partition%20eq%20' . $args{partition};
     }
-    if ($params{properties}) {
-        push @parameters, '$select=' . $params{properties};
+    if ($args{properties}) {
+        push @parameters, '$select=' . $args{properties};
     }
 
     my $url = "/mgmt/tm/ltm/node/stats";
@@ -292,9 +292,9 @@ sub get_node_stats($self, %params) {
     return $result;
 }
 
-sub _post($self, $path, %params) {
+sub _post($self, $path, %args) {
 
-    my $tx = $self->{agent}->post($self->{url} . $path => json => \%params);
+    my $tx = $self->{agent}->post($self->{url} . $path => json => \%args);
 
     my $result = $tx->result();
 
@@ -311,9 +311,9 @@ sub _post($self, $path, %params) {
     }
 }
 
-sub _get($self, $path, %params) {
+sub _get($self, $path, %args) {
 
-    my $tx = $self->{agent}->get( $self->{url} . $path => form => \%params);
+    my $tx = $self->{agent}->get($self->{url} . $path => form => \%args);
 
     my $result = $tx->result();
 
