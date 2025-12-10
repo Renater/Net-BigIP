@@ -6,7 +6,7 @@ use Carp;
 use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json);
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 sub new($class, %params) {
 
