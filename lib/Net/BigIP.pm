@@ -5,7 +5,7 @@ use strict;
 
 use Carp;
 use Mojo::UserAgent;
-use JSON;
+use Mojo::JSON qw(decode_json);
 
 our $VERSION = '0.2';
 
@@ -314,7 +314,7 @@ sub _post {
 
     my $result = $tx->result();
 
-    my $content = eval { from_json($result->body()) };
+    my $content = decode_json($result->body());
 
     if ($result->is_success()) {
         return $content;
@@ -334,7 +334,7 @@ sub _get {
 
     my $result = $tx->result();
 
-    my $content = eval { from_json($result->body()) };
+    my $content = decode_json($result->body());
 
     if ($result->is_success()) {
         return $content;
