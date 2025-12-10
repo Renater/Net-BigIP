@@ -1,0 +1,4 @@
+exclude = Subroutines::ProhibitSubroutinePrototypes
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Mojo::Base

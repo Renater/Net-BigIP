@@ -12,5 +12,7 @@ plan(skip_all => 'Author test, set $ENV{AUTHOR_TESTING} to a true value to run')
 eval { require Test::Perl::Critic; };
 plan(skip_all => 'Test::Perl::Critic required') if $EVAL_ERROR;
 
-Test::Perl::Critic->import();
+my $config = File::Spec->catfile('t', 'perlcriticrc');
+Test::Perl::Critic->import(-profile => $config);
+
 all_critic_ok();
