@@ -6,8 +6,8 @@ WriteMakefile(
     ABSTRACT_FROM  => 'lib/Net/BigIP.pm',
     LICENSE        => 'artistic_2',
     PREREQ_PM => {
-        'JSON'           => 0,
-        'LWP::UserAgent' => 0,
+        'Mojo::JSON'      => 0,
+        'Mojo::UserAgent' => 0,
     },
     CONFIGURE_REQUIRES => {
         'version' => 0,
