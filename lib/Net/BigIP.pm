@@ -1,5 +1,35 @@
 package Net::BigIP;
 
+=head1 NAME
+
+Net::BigIP - REST interface for BigIP
+
+=head1 DESCRIPTION
+
+This module provides a Perl interface for communication with BigIP load-balancer
+using REST interface.
+
+=head1 SYNOPSIS
+
+    use Net::BigIP;
+
+    my $bigip = Net::BigIP->new(
+        url => 'https://my.bigip.tld'
+    ):
+    $bigip->create_session(
+        username => 'user',
+        password => 's3cr3t',
+    );
+    my $certs = $bigip->get_certs();
+
+=head1 LICENSE
+
+You can use and distribute this module under the same terms as Perl itself.
+See the C<LICENSE> file included in this distribution for complete
+details.
+
+=cut
+
 use Mojo::Base -strict, -signatures;
 
 use Carp;
@@ -7,6 +37,14 @@ use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json);
 
 our $VERSION = '0.3';
+
+=head1 CLASS METHODS
+
+=head2 Net::BigIP->new(url => $url, [ssl_opts => $opts, timeout => $timeout, token => $token])
+
+Creates a new L<Net::BigIP> instance.
+
+=cut
 
 sub new($class, %args) {
 
@@ -30,6 +68,14 @@ sub new($class, %args) {
     return $self;
 }
 
+=head1 INSTANCE METHODS
+
+=head2 $bigip->create_session(username => $username, password => $password)
+
+Creates a new session token for the given user.
+
+=cut
+
 sub create_session($self, %args) {
 
     croak "missing username parameter" unless $args{username};
@@ -50,10 +96,36 @@ sub create_session($self, %args) {
     });
 }
 
+=head2 $bigip->get_token()
+
+Return the current session token.
+
+=cut
+
 sub get_token($self) {
 
     return $self->{token};
 }
+
+=head2 $bigip->get_certificates([ partition => $partition, properties => $properties ])
+
+Return the list of certificates.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
 
 sub get_certificates($self, %args) {
 
@@ -75,6 +147,26 @@ sub get_certificates($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_virtual_addresses([ partition => $partition, properties => $properties ])
+
+Return the list of virtual addresses.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
+
 sub get_virtual_addresses($self, %args) {
 
     my @parameters;
@@ -94,6 +186,26 @@ sub get_virtual_addresses($self, %args) {
 
     return $result;
 }
+
+=head2 $bigip->get_virtual_servers([ partition => $partition, properties => $properties ])
+
+Return the list of virtual servers.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
 
 sub get_virtual_servers($self, %args) {
 
@@ -117,6 +229,34 @@ sub get_virtual_servers($self, %args) {
 
     return $result;
 }
+
+=head2 $bigip->get_virtual_server_policies(%parameters)
+
+Return the list of policies for the given virtual server.
+
+Available parameters:
+
+=over
+
+=item virtual_server => $virtual_server
+
+The virtual server (mandatory).
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=item expand_subcollection => $boolean
+
+Wether to expand subcollections or not.
+
+=back
+
+=cut
 
 sub get_virtual_server_policies($self, %args) {
 
@@ -143,6 +283,34 @@ sub get_virtual_server_policies($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_policy_rules(%parameters)
+
+Return the list of rules for the given policy.
+
+Available parameters:
+
+=over
+
+=item policy => $policy
+
+The policy (mandatory).
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=item expand_subcollection => $boolean
+
+Wether to expand subcollections or not.
+
+=back
+
+=cut
+
 sub get_policy_rules($self, %args) {
 
     croak "missing policy parameter" unless $args{policy};
@@ -168,6 +336,26 @@ sub get_policy_rules($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_pools([ partition => $partition, properties => $properties ])
+
+Return the list of pools.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
+
 sub get_pools($self, %args) {
 
     my @parameters;
@@ -187,6 +375,30 @@ sub get_pools($self, %args) {
 
     return $result;
 }
+
+=head2 $bigip->get_pool_members(%parameters)
+
+Return the list of members for the given pool.
+
+Available parameters:
+
+=over
+
+=item pool => $pool
+
+The pool (mandatory).
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
 
 sub get_pool_members($self, %args) {
 
@@ -210,6 +422,30 @@ sub get_pool_members($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_pool_member_stats(%parameters)
+
+Return statistics for the given pool members:.
+
+Available parameters:
+
+=over
+
+=item pool => $pool
+
+The pool (mandatory).
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
+
 sub get_pool_member_stats($self, %args) {
 
     croak "missing pool parameter" unless $args{pool};
@@ -232,6 +468,26 @@ sub get_pool_member_stats($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_pool_stats(%parameters)
+
+Return statistics for the pools.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
+
 sub get_pool_stats($self, %args) {
 
     my @parameters;
@@ -252,6 +508,26 @@ sub get_pool_stats($self, %args) {
     return $result;
 }
 
+=head2 $bigip->get_nodes(%parameters)
+
+Return the list of nodes.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
+
 sub get_nodes($self, %args) {
 
     my @parameters;
@@ -271,6 +547,26 @@ sub get_nodes($self, %args) {
 
     return $result;
 }
+
+=head2 $bigip->get_node_stats(%parameters)
+
+Return statistics for the nodes.
+
+Available parameters:
+
+=over
+
+=item partition => $partition
+
+Filter objects list to given partition.
+
+=item properties => $properties
+
+Filter objects properties to the given ones, as a comma-separated list.
+
+=back
+
+=cut
 
 sub get_node_stats($self, %args) {
 
@@ -331,270 +627,3 @@ sub _get($self, $path, %args) {
 }
 
 1;
-__END__
-
-=head1 NAME
-
-Net::BigIP - REST interface for BigIP
-
-=head1 DESCRIPTION
-
-This module provides a Perl interface for communication with BigIP load-balancer
-using REST interface.
-
-=head1 SYNOPSIS
-
-    use Net::BigIP;
-
-    my $bigip = Net::BigIP->new(
-        url => 'https://my.bigip.tld'
-    ):
-    $bigip->create_session(
-        username => 'user',
-        password => 's3cr3t',
-    );
-    my $certs = $bigip->get_certs();
-
-=head1 CLASS METHODS
-
-=head2 Net::BigIP->new(url => $url, [ssl_opts => $opts, timeout => $timeout, token => $token])
-
-Creates a new L<Net::BigIP> instance.
-
-=head1 INSTANCE METHODS
-
-=head2 $bigip->create_session(username => $username, password => $password)
-
-Creates a new session token for the given user.
-
-=head2 $bigip->get_token()
-
-Return the current session token.
-
-=head2 $bigip->get_certificates([ partition => $partition, properties => $properties ])
-
-Return the list of certificates.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_virtual_addresses([ partition => $partition, properties => $properties ])
-
-Return the list of virtual addresses.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_virtual_servers([ partition => $partition, properties => $properties ])
-
-Return the list of virtual servers.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_pools([ partition => $partition, properties => $properties ])
-
-Return the list of pools.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_nodes(%parameters)
-
-Return the list of nodes.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_node_stats(%parameters)
-
-Return statistics for the nodes.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_policy_rules(%parameters)
-
-Return the list of rules for the given policy.
-
-Available parameters:
-
-=over
-
-=item policy => $policy
-
-The policy (mandatory).
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=item expand_subcollection => $boolean
-
-Wether to expand subcollections or not.
-
-=back
-
-=head2 $bigip->get_virtual_server_policies(%parameters)
-
-Return the list of policies for the given virtual server.
-
-Available parameters:
-
-=over
-
-=item virtual_server => $virtual_server
-
-The virtual server (mandatory).
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=item expand_subcollection => $boolean
-
-Wether to expand subcollections or not.
-
-=back
-
-=head2 $bigip->get_pool_members(%parameters)
-
-Return the list of members for the given pool.
-
-Available parameters:
-
-=over
-
-=item pool => $pool
-
-The pool (mandatory).
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_pool_member_stats(%parameters)
-
-Return statistics for the given pool members:.
-
-Available parameters:
-
-=over
-
-=item pool => $pool
-
-The pool (mandatory).
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head2 $bigip->get_pool_stats(%parameters)
-
-Return statistics for the pools.
-
-Available parameters:
-
-=over
-
-=item partition => $partition
-
-Filter objects list to given partition.
-
-=item properties => $properties
-
-Filter objects properties to the given ones, as a comma-separated list.
-
-=back
-
-=head1 LICENSE
-
-You can use and distribute this module under the same terms as Perl itself.
-See the C<LICENSE> file included in this distribution for complete
-details.
