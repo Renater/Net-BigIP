@@ -1,4 +1,4 @@
-# BigIP::REST
+# Net::BigIP
 
 ## DESCRIPTION
 
@@ -9,8 +9,8 @@ using REST interface.
 
 To install this module:
 
-    $> tar xvzf BigIP-REST-X.Y.tar.gz
-    $> cd BigIP-REST-X.Y
+    $> tar xvzf Net-BigIP-X.Y.tar.gz
+    $> cd Net-BigIP-X.Y
     $> perl Makefile.PL
     $> make
     $> make test

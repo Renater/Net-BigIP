@@ -22,8 +22,8 @@ WriteMakefile(
         'resources' => {
             repository => {
                 type => 'git',
-                url  => 'git://github.com/Renater/BigIP-REST.git',
-                web  => 'https://github.com/Renater/BigIP-REST'
+                url  => 'git://github.com/Renater/Net-BigIP.git',
+                web  => 'https://github.com/Renater/Net-BigIP'
             },
         }
     }
