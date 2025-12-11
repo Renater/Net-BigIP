@@ -75,8 +75,9 @@ has ua => (
 
 sub _build_ua($self) {
     return Mojo::UserAgent->new(
-        tls_options => $self->ssl_opts(),
-        timeout     => $self->timeout()
+        tls_options     => $self->ssl_opts(),
+        connect_timeout => $self->timeout(),
+        request_timeout => $self->timeout(),
     );
 }
 
