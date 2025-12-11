@@ -13,7 +13,6 @@ WriteMakefile(
         'version' => 0,
     },
     TEST_REQUIRES  => {
-        'IO::Socket::SSL' => 0,
         'Test::Exception' => 0,
         'Test::More'      => 0,
     },
