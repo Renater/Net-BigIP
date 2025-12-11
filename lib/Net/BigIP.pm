@@ -38,6 +38,8 @@ use Mojo::JSON qw(decode_json);
 use Moo;
 use Types::Standard qw(Bool Str Int HashRef);
 
+no warnings qw(experimental::signatures);
+
 our $VERSION = '0.3';
 
 =head1 CLASS METHODS
