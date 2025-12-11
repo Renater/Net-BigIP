@@ -35,6 +35,8 @@ use Mojo::Base -strict, -signatures;
 use Carp;
 use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json);
+use Moo;
+use Types::Standard qw(Str Int HashRef);
 
 our $VERSION = '0.3';
 
@@ -46,26 +48,36 @@ Creates a new L<Net::BigIP> instance.
 
 =cut
 
-sub new($class, %args) {
+has url => (
+    is       => 'ro',
+    isa      => Str,
+    required => 1,
+);
 
-    croak "missing url parameter" unless $args{url};
+has token => (
+    is  => 'rwp',
+    isa => Str,
+);
 
-    my $url   = $args{url};
-    my $agent = Mojo::UserAgent->new();
+has timeout => (
+    is  => 'ro',
+    isa => Int
+);
 
-    $agent->timeout($args{timeout})
-        if $args{timeout};
-    $agent->tls_options($args{ssl_opts})
-        if $args{ssl_opts} && ref $args{ssl_opts} eq 'HASH';
+has ssl_opts => (
+    is  => 'ro',
+    isa => HashRef
+);
 
-    my $self = {
-        url   => $url,
-        agent => $agent,
-        token => $args{token},
-    };
-    bless $self, $class;
+has ua => (
+    is => 'lazy',
+);
 
-    return $self;
+sub _build_ua($self) {
+    return Mojo::UserAgent->new(
+        tls_options => $self->ssl_opts(),
+        timeout     => $self->timeout()
+    );
 }
 
 =head1 INSTANCE METHODS
@@ -88,23 +100,12 @@ sub create_session($self, %args) {
         loginProviderName => 'tmos'
     );
 
-    $self->{token} = $result->{token}->{token};
+    $self->_set_token($result->{token}->{token});
 
-    $self->{agent}->on(start => sub {
+    $self->ua()->on(start => sub {
         my ($ua, $tx) = @_;
-        $tx->req->headers->header('X-F5-Auth-Token' => $self->{token});
+        $tx->req->headers->header('X-F5-Auth-Token' => $self->token());
     });
-}
-
-=head2 $bigip->get_token()
-
-Return the current session token.
-
-=cut
-
-sub get_token($self) {
-
-    return $self->{token};
 }
 
 =head2 $bigip->get_certificates([ partition => $partition, properties => $properties ])
@@ -590,7 +591,7 @@ sub get_node_stats($self, %args) {
 
 sub _post($self, $path, %args) {
 
-    my $tx = $self->{agent}->post($self->{url} . $path => json => \%args);
+    my $tx = $self->ua()->post($self->{url} . $path => json => \%args);
 
     my $result = $tx->result();
 
@@ -609,7 +610,7 @@ sub _post($self, $path, %args) {
 
 sub _get($self, $path, %args) {
 
-    my $tx = $self->{agent}->get($self->{url} . $path => form => \%args);
+    my $tx = $self->ua()->get($self->{url} . $path => form => \%args);
 
     my $result = $tx->result();
 

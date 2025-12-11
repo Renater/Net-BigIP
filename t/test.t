@@ -42,7 +42,7 @@ lives_ok {
 BAIL_OUT('unable to connect, skipping remaining tests') if $EVAL_ERROR;
 
 ok(
-    defined $bigip->get_token(),
+    defined $bigip->token(),
     'bigip handle has authentication token'
 );
 
