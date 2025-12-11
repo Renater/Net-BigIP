@@ -36,7 +36,7 @@ use Carp;
 use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json);
 use Moo;
-use Types::Standard qw(Str Int HashRef);
+use Types::Standard qw(Bool Str Int HashRef);
 
 our $VERSION = '0.3';
 
@@ -64,9 +64,19 @@ has timeout => (
     isa => Int
 );
 
-has ssl_opts => (
+has tls_options => (
     is  => 'ro',
     isa => HashRef
+);
+
+has ca => (
+    is  => 'ro',
+    isa => Str,
+);
+
+has insecure => (
+    is  => 'ro',
+    isa => Bool,
 );
 
 has ua => (
@@ -75,7 +85,9 @@ has ua => (
 
 sub _build_ua($self) {
     return Mojo::UserAgent->new(
-        tls_options     => $self->ssl_opts(),
+        tls_options     => $self->tls_options(),
+        ca              => $self->ca(),
+        insecure        => $self->insecure(),
         connect_timeout => $self->timeout(),
         request_timeout => $self->timeout(),
     );

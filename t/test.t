@@ -5,7 +5,6 @@ use warnings;
 
 use English qw(-no_match_vars);
 use Net::BigIP;
-use IO::Socket::SSL;
 
 use Test::More;
 use Test::Exception;
@@ -22,11 +21,8 @@ plan tests => 24;
 my $bigip;
 lives_ok {
     $bigip = Net::BigIP->new(
-        url => $ENV{BIGIP_TEST_URL},
-        ssl_opts => {
-            verify_hostname => 0,
-            SSL_verify_mode => SSL_VERIFY_NONE
-        }
+        url      => $ENV{BIGIP_TEST_URL},
+        insecure => 1
     );
 } 'connection succeeds';
 
