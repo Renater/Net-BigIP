@@ -604,7 +604,7 @@ sub get_node_stats($self, %args) {
 
 sub _post($self, $path, %args) {
 
-    my $tx = $self->ua()->post($self->{url} . $path => json => \%args);
+    my $tx = $self->ua()->post($self->url() . $path => json => \%args);
 
     my $result = $tx->result();
 
@@ -623,7 +623,7 @@ sub _post($self, $path, %args) {
 
 sub _get($self, $path, %args) {
 
-    my $tx = $self->ua()->get($self->{url} . $path => form => \%args);
+    my $tx = $self->ua()->get($self->url() . $path => form => \%args);
 
     my $result = $tx->result();
 
